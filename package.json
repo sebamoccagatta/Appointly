@@ -1,0 +1,21 @@
+{
+	"name": "appointly",
+	"version": "1.0.0",
+	"workspaces": [
+		"domain",
+		"apps/backend"
+	],
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"tsx": "^4.20.5",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	}
+}

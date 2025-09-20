@@ -1,0 +1,11 @@
+{
+    "files": [],
+    "references": [
+      { "path": "./domain" },
+      { "path": "./apps/backend" }
+    ],
+    "compilerOptions": {
+      "composite": true
+    }
+  }
+  

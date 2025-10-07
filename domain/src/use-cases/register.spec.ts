@@ -9,6 +9,9 @@ import {
 
 class FakeRepo implements UserRepository {
   constructor(private users: User[] = []) {}
+  async findById(): Promise<User | null> {
+    return null;
+  }
   async findByEmail(email: string) {
     return this.users.find((u) => u.email === email) ?? null;
   }

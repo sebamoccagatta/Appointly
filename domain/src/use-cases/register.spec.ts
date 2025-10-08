@@ -1,11 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { createUser } from "./register";
 import { UserRole, type User } from "../entities/user";
-import {
-  type UserRepository,
-  type IdGenerator,
-  type Clock,
-} from "../services/user-service";
+import { type UserRepository } from "../services/user-service";
+import type { IdGenerator, Clock } from "../services/shared-ports";
 
 class FakeRepo implements UserRepository {
   constructor(private users: User[] = []) {}

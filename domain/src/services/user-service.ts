@@ -6,14 +6,6 @@ export interface UserRepository {
   findById(id: string): Promise<User | null>;
 }
 
-export interface IdGenerator {
-  next(): string;
-}
-
-export interface Clock {
-  now(): Date;
-}
-
 export type CredentialsStatus = "ACTIVE" | "BLOCKED";
 export interface CredentialsRecord {
   userId: string;

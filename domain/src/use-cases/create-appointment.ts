@@ -43,10 +43,13 @@ export async function createAppointment(args: {
     throw new Error("RULE_SLOT_OUT_OF_AVAILABILITY");
   }
 
+  const buffer = schedule.bufferMinutes ?? 0;
+  const fromWithBuffer = addMinutes(start, -buffer);
+  const toWithBuffer = addMinutes(end, buffer);
   const overlaps = await appointmentRepo.findOverlap({
     scheduleId: schedule.id,
-    from: start,
-    to: end,
+    from: fromWithBuffer,
+    to: toWithBuffer,
   });
 
   if (overlaps.length > 0) {

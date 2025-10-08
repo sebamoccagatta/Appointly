@@ -363,4 +363,112 @@ describe("CreateAppointment Use Case", () => {
     expect(appt.start).toEqual(requestStart);
     expect(appt.end).toEqual(new Date("2025-01-01T11:10:00Z")); // 30' de duración + start 10:40 = 11:10
   });
+
+  test("respects schedule exception: day closed (available=false)", async () => {
+    const start = new Date("2025-01-01T10:00:00Z"); // mismo día que la exception
+    const weekday = start.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+    const offering: Offering = {
+      id: "off-1",
+      name: "Consultation",
+      durationMinutes: 30,
+      status: "ACTIVE",
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+
+    // Plantilla diría que está abierto, pero exception cierra el día
+    const schedule: Schedule = {
+      id: "sch-1",
+      professionalId: "pro-1",
+      weeklyTemplate: [
+        { weekday, windows: [{ start: "09:00", end: "18:00" }] },
+      ],
+      exceptions: [
+        { date: "2025-01-01", available: false }, // ← cierra el día
+      ],
+      bufferMinutes: 10,
+      timezone: "America/Argentina/Buenos_Aires",
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+
+    const offeringRepo = new FakeOfferingRepo([offering]);
+    const scheduleRepo = new FakeScheduleRepo([schedule]);
+    const appointmentRepo = new FakeAppointmentRepo();
+
+    await expect(
+      createAppointment({
+        data: {
+          scheduleId: "sch-1",
+          offeringId: "off-1",
+          customerId: "cus-1",
+          start,
+        },
+        deps: {
+          offeringRepo,
+          scheduleRepo,
+          appointmentRepo,
+          ids: fixedIds,
+          clock: fixedClock,
+        },
+      })
+    ).rejects.toThrow("RULE_SLOT_OUT_OF_AVAILABILITY");
+  });
+
+  test("respects schedule exception: windows override weekly template when available=true", async () => {
+    const start = new Date("2025-01-01T20:00:00Z"); // fuera de la plantilla 09–18, pero exception abre 19–21
+    const weekday = start.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+    const offering: Offering = {
+      id: "off-1",
+      name: "Consultation",
+      durationMinutes: 30,
+      status: "ACTIVE",
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+
+    const schedule: Schedule = {
+      id: "sch-1",
+      professionalId: "pro-1",
+      weeklyTemplate: [
+        { weekday, windows: [{ start: "09:00", end: "18:00" }] },
+      ],
+      exceptions: [
+        {
+          date: "2025-01-01",
+          available: true,
+          windows: [{ start: "19:00", end: "21:00" }], // ← reemplaza plantilla
+        },
+      ],
+      bufferMinutes: 10,
+      timezone: "America/Argentina/Buenos_Aires",
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+
+    const offeringRepo = new FakeOfferingRepo([offering]);
+    const scheduleRepo = new FakeScheduleRepo([schedule]);
+    const appointmentRepo = new FakeAppointmentRepo();
+
+    const appt = await createAppointment({
+      data: {
+        scheduleId: "sch-1",
+        offeringId: "off-1",
+        customerId: "cus-1",
+        start,
+      },
+      deps: {
+        offeringRepo,
+        scheduleRepo,
+        appointmentRepo,
+        ids: fixedIds,
+        clock: fixedClock,
+      },
+    });
+
+    expect(appt.start).toEqual(start);
+    expect(appt.end).toEqual(new Date("2025-01-01T20:30:00Z"));
+  });
 });

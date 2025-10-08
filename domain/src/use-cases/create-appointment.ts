@@ -83,19 +83,24 @@ function isWithinAvailability(
   end: Date
 ): boolean {
   const weekday = start.getUTCDay() as WeeklyTemplateItem["weekday"];
+  const dateStr = toYYYYMMDDUTC(start);
+
+  // 1) Si hay exception para la fecha, decide según ella
+  const exception = schedule.exceptions?.find((e) => e.date === dateStr);
+  if (exception) {
+    if (exception.available === false) return false; // día cerrado
+    const windows = exception.windows ?? [];
+    if (windows.length === 0) return false; // disponible=true pero sin ventanas → tratamos como cerrado
+    return isContainedInWindows(start, end, windows);
+  }
+
+  // 2) Si no hay exception, usar plantilla semanal
   const dayTemplate = schedule.weeklyTemplate.find(
     (w) => w.weekday === weekday
   );
   if (!dayTemplate || dayTemplate.windows.length === 0) return false;
 
-  const startMin = minutesOfDayUTC(start);
-  const endMin = minutesOfDayUTC(end);
-
-  return dayTemplate.windows.some((w) => {
-    const wStart = parseHHMM(w.start);
-    const wEnd = parseHHMM(w.end);
-    return wStart <= startMin && endMin <= wEnd;
-  });
+  return isContainedInWindows(start, end, dayTemplate.windows);
 }
 
 function parseHHMM(hhmm: string): number {
@@ -110,4 +115,25 @@ function parseHHMM(hhmm: string): number {
 
 function minutesOfDayUTC(d: Date): number {
   return d.getUTCHours() * 60 + d.getUTCMinutes();
+}
+
+function isContainedInWindows(
+  start: Date,
+  end: Date,
+  windows: { start: string; end: string }[]
+) {
+  const startMin = minutesOfDayUTC(start);
+  const endMin = minutesOfDayUTC(end);
+  return windows.some((w) => {
+    const wStart = parseHHMM(w.start);
+    const wEnd = parseHHMM(w.end);
+    return wStart <= startMin && endMin <= wEnd;
+  });
+}
+
+function toYYYYMMDDUTC(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = `${d.getUTCMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getUTCDate()}`.padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }

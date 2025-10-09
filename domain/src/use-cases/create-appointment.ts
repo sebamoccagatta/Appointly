@@ -37,6 +37,10 @@ export async function createAppointment(args: {
   const offering = await offeringRepo.findById(offeringId);
   if (!offering) throw new Error("OFFERING_NOT_FOUND");
 
+  if (offering.status !== "ACTIVE") {
+    throw new Error("OFFERING_INACTIVE");
+  }
+
   const end = addMinutes(start, offering.durationMinutes);
 
   if (!isWithinAvailability(schedule, start, end)) {

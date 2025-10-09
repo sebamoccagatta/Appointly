@@ -471,4 +471,51 @@ describe("CreateAppointment Use Case", () => {
     expect(appt.start).toEqual(start);
     expect(appt.end).toEqual(new Date("2025-01-01T20:30:00Z"));
   });
+
+  test("fails when offering is INACTIVE", async () => {
+    const start = new Date("2025-01-01T10:00:00Z");
+    const weekday = start.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+    const offering: Offering = {
+      id: "off-1",
+      name: "Consultation",
+      durationMinutes: 30,
+      status: "INACTIVE", // ← clave
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+    const schedule: Schedule = {
+      id: "sch-1",
+      professionalId: "pro-1",
+      weeklyTemplate: [
+        { weekday, windows: [{ start: "09:00", end: "18:00" }] },
+      ],
+      bufferMinutes: 10,
+      timezone: "America/Argentina/Buenos_Aires",
+      createdAt: fixedNow,
+      updatedAt: fixedNow,
+    };
+
+    const offeringRepo = new FakeOfferingRepo([offering]);
+    const scheduleRepo = new FakeScheduleRepo([schedule]);
+    const appointmentRepo = new FakeAppointmentRepo();
+
+    await expect(
+      createAppointment({
+        data: {
+          scheduleId: "sch-1",
+          offeringId: "off-1",
+          customerId: "cus-1",
+          start,
+        },
+        deps: {
+          offeringRepo,
+          scheduleRepo,
+          appointmentRepo,
+          ids: fixedIds,
+          clock: fixedClock,
+        },
+      })
+    ).rejects.toThrow("OFFERING_INACTIVE");
+  });
 });

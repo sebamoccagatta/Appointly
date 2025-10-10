@@ -51,6 +51,10 @@ class FakeAppointmentRepo implements AppointmentRepository {
   async update(appointment: Appointment) {
     return;
   }
+
+  async listByScheduleAndRange(params: { scheduleId: string; from: Date; to: Date }): Promise<Appointment[]> {
+    return [];
+  }
 }
 
 const fixedNow = new Date("2025-01-01T09:00:00Z");

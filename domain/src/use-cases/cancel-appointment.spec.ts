@@ -25,6 +25,10 @@ class FakeAppointmentRepo implements AppointmentRepository {
     const i = this.rows.findIndex((x) => x.id === a.id);
     if (i >= 0) this.rows[i] = a;
   }
+
+  async listByScheduleAndRange(params: { scheduleId: string; from: Date; to: Date }): Promise<Appointment[]> {
+    return [];
+  }
 }
 
 const fixedNow = new Date("2025-01-01T10:00:00Z");

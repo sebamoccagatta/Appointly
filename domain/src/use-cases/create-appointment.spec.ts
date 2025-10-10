@@ -43,6 +43,14 @@ class FakeAppointmentRepo implements AppointmentRepository {
   seed(appt: Appointment) {
     this.rows.push(appt);
   }
+
+  async findById(id: string) {
+    return null;
+  }
+
+  async update(appointment: Appointment) {
+    return;
+  }
 }
 
 const fixedNow = new Date("2025-01-01T09:00:00Z");

@@ -3,6 +3,28 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@test/*": [
+        "test-support/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@entities/*": [
+        "src/entities/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ]
+    }
   },
-  "include": ["src"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts"
+  ]
 }

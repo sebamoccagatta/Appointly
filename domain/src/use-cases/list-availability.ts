@@ -1,8 +1,10 @@
-import type { Offering } from "../entities/offering";
-import type { Schedule, WeeklyTemplateItem } from "../entities/schedule";
 import type { OfferingRepository } from "../services/offering-ports";
 import type { ScheduleRepository } from "../services/schedule-ports";
 import type { AppointmentRepository } from "../services/appointment-ports";
+
+import { resolveWindowsForDate, eachDayUTC } from "../utils/schedule-availability";
+import { addMinutes } from "../utils/date";
+import { setTimeUTC, parseHHMM } from "../utils/time-window";
 
 type Deps = {
   offeringRepo: OfferingRepository;
@@ -77,68 +79,4 @@ export async function listAvailableSlots(args: {
   // Orden cronológico por las dudas (ya debería salir ordenado)
   result.sort((a, b) => a.start.getTime() - b.start.getTime());
   return result;
-}
-
-function resolveWindowsForDate(schedule: Schedule, d: Date) {
-  const dateStr = toYYYYMMDDUTC(d);
-  const exception = schedule.exceptions?.find(e => e.date === dateStr);
-  if (exception) {
-    if (exception.available === false) return [];
-    const win = exception.windows ?? [];
-    return win;
-  }
-
-  const weekday = d.getUTCDay() as WeeklyTemplateItem["weekday"];
-  const dayTemplate = schedule.weeklyTemplate.find(w => w.weekday === weekday);
-  return dayTemplate?.windows ?? [];
-}
-
-function eachDayUTC(from: Date, to: Date): Date[] {
-  const days: Date[] = [];
-  let cursor = startOfUTCDay(from);
-  // Hacemos "to" exclusivo convirtiéndolo a día inclusive con to-1ms
-  const endInclusive = startOfUTCDay(new Date(to.getTime() - 1));
-  while (cursor <= endInclusive) {
-    days.push(cursor);
-    cursor = addDaysUTC(cursor, 1);
-  }
-  return days;
-}
-
-function startOfUTCDay(d: Date): Date {
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0));
-}
-
-function addDaysUTC(d: Date, days: number): Date {
-  const nd = new Date(d.getTime());
-  nd.setUTCDate(nd.getUTCDate() + days);
-  return nd;
-}
-
-function toYYYYMMDDUTC(d: Date): string {
-  const y = d.getUTCFullYear();
-  const m = `${d.getUTCMonth() + 1}`.padStart(2, "0");
-  const day = `${d.getUTCDate()}`.padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-// Convierte "HH:mm" en minutos desde medianoche
-function parseHHMM(hhmm: string): number {
-  const [hStr, mStr] = hhmm.split(":");
-  const h = Number(hStr);
-  const m = mStr !== undefined ? Number(mStr) : 0;
-  if (isNaN(h) || isNaN(m)) {
-    throw new Error(`Invalid time format: ${hhmm}`);
-  }
-  return h * 60 + m;
-}
-
-// Devuelve un Date con la misma fecha UTC que 'd' y el tiempo en minutos desde medianoche
-function setTimeUTC(d: Date, minutesFromMidnight: number): Date {
-  const base = startOfUTCDay(d);
-  return new Date(base.getTime() + minutesFromMidnight * 60_000);
-}
-
-function addMinutes(d: Date, minutes: number): Date {
-  return new Date(d.getTime() + minutes * 60_000);
 }

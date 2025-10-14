@@ -3,6 +3,8 @@ import { UserRole } from "../entities/user";
 import type { AppointmentRepository } from "../services/appointment-ports";
 import type { Clock } from "../services/shared-ports";
 
+import { diffHours } from "../utils/date";
+
 type Deps = {
     repo: AppointmentRepository;
     clock: Clock;
@@ -64,8 +66,4 @@ export async function cancelAppointment(args: {
 
     await repo.update(updated);
     return updated;
-}
-
-function diffHours(from: Date, to: Date): number {
-  return (to.getTime() - from.getTime()) / 3_600_000;
 }

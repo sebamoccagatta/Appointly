@@ -6,6 +6,8 @@ import type { ScheduleRepository } from "../services/schedule-ports";
 import type { Clock, IdGenerator } from "../services/shared-ports";
 import { createAppointment } from "./create-appointment";
 
+import { diffHours } from "../utils/date";
+
 type Deps = {
   appointmentRepo: AppointmentRepository;
   offeringRepo: OfferingRepository;
@@ -93,8 +95,4 @@ export async function rescheduleAppointment(args: {
   await appointmentRepo.update(updatedOld);
 
   return newAppt;
-}
-
-function diffHours(from: Date, to: Date): number {
-  return (to.getTime() - from.getTime()) / 3_600_000;
 }

@@ -8,7 +8,8 @@ export function buildApp() {
         }
     });
 
-    app.register(import("./routes/health"));
+    app.register(import("./routes/health.js"));
+    app.register(import("./routes/auth.js"));
 
     return app;
 }

@@ -1,18 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "moduleResolution": "node",
-    "module": "ES2022",
-    "strict": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "baseUrl": ".",
-    "esModuleInterop": true,
-    "skipLibCheck": true
+    "paths": {
+      "demo-domain": [
+        "../../domain/dist"
+      ]
+    },
+    "outDir": "dist",
+    "rootDir": "src"
   },
   "include": [
-    "src",
-    "vitest.config.ts"
+    "src"
   ]
 }

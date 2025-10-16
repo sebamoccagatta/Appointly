@@ -16,6 +16,7 @@ export interface CredentialsRecord {
 
 export interface CredentialsRepository {
   findByEmail(email: string): Promise<CredentialsRecord | null>;
+  create(rec: CredentialsRecord): Promise<void>;
 }
 
 export interface PasswordVerifier {

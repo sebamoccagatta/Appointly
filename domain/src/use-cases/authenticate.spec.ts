@@ -13,6 +13,9 @@ class FakeCredentialsRepo implements CredentialsRepository {
   async findByEmail(email: string) {
     return this.rows.find((r) => r.email === email) ?? null;
   }
+  async create(_rec: CredentialsRecord) {
+    /* no-op */
+  }
 }
 
 class FakeUsersRepo implements UserRepository {

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { registerController } from "../controllers/auth-controller.js";
+import { registerController, loginController } from "../controllers/auth-controller.js";
 import { mapDomainErrorToHttp } from "../errors/map-domain-error.js";
 
 export default async function authRoutes(app: FastifyInstance) {
@@ -12,22 +12,36 @@ export default async function authRoutes(app: FastifyInstance) {
     });
     app.post("/auth/register", async (request, reply) => {
         try {
-        const body = RegisterBody.parse(request.body);
-        const user = await registerController(body);
+            const body = RegisterBody.parse(request.body);
+            const user = await registerController(body);
 
-        return reply.status(201).send({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
-        });
+            return reply.status(201).send({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt.toISOString(),
+                updatedAt: user.updatedAt.toISOString(),
+            });
         } catch (err: any) {
-        const mapped = mapDomainErrorToHttp(err);
-        return reply.status(mapped.status).send({ error: mapped.code, message: mapped.message });
+            const mapped = mapDomainErrorToHttp(err);
+            return reply.status(mapped.status).send({ error: mapped.code, message: mapped.message });
         }
     });
 
+    const LoginBody = z.object({
+        email: z.string(),
+        password: z.string(),
+    });
 
+    app.post("/auth/login", async (request, reply) => {
+        try {
+            const body = LoginBody.parse(request.body);
+            const token = await loginController({ email: body.email, password: body.password });
+            return reply.status(200).send(token);
+        } catch (err: any) {
+            const mapped = mapDomainErrorToHttp(err);
+            return reply.status(mapped.status).send({ error: mapped.code, message: mapped.message });
+        }
+    });
 }

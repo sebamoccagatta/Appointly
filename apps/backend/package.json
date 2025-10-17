@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.7.2",
     "execa": "^9.6.0",
     "light-my-request": "^6.6.0",
@@ -31,6 +32,7 @@
     "domain": "*",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.1",
+    "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^13.1.2",
     "zod": "^4.1.12"
   }

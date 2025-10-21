@@ -45,3 +45,54 @@ enum CredStatus {
   ACTIVE
   BLOCKED
 }
+
+model Offering {
+  id              String         @id @default(uuid())
+  name            String
+  durationMinutes Int
+  status          OfferingStatus @default(ACTIVE)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([status])
+}
+
+enum OfferingStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Schedule {
+  id             String   @id @default(uuid())
+  professionalId String
+  timezone       String
+  bufferMinutes  Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  WeeklyTemplate ScheduleWeeklyTemplate[]
+  Exceptions     ScheduleException[]
+
+  @@index([professionalId])
+}
+
+model ScheduleWeeklyTemplate {
+  id         String @id @default(uuid())
+  scheduleId String
+  weekday    Int // 0-6
+  start      String // "09:00"
+  end        String // "18:00"
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+}
+
+model ScheduleException {
+  id         String   @id @default(uuid())
+  scheduleId String
+  date       DateTime
+  available  Boolean
+  start      String?
+  end        String?
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+}

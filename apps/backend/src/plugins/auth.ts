@@ -7,7 +7,8 @@ const SECRET = process.env.JWT_SECRET ?? "dev-secret";
 const authPlugin: FastifyPluginAsync = async (app) => {
   app.addHook("preHandler", async (request, reply) => {
     const url = request.url;
-    if (url === "/health" || url.startsWith("/auth/")) {
+    const method = request.method;
+    if (url === "/health" || url.startsWith("/auth/") || method === "GET" && url.startsWith("/offerings")) {
       return; // no exigir token
     }
     const auth = request.headers.authorization;

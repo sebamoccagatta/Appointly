@@ -4,6 +4,12 @@ export default defineConfig({
   test: {
     include: ["src/**/*.spec.ts"],
     globals: true,
-    setupFiles: ["./vitest.setup.ts"]
+    setupFiles: ["./vitest.setup.ts"],
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        maxThreads: 1
+      }
+    }
   }
 });

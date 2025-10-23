@@ -19,6 +19,7 @@ export function buildApp() {
     })
     app.register(import("./routes/offerings.js"));
     app.register(import("./routes/schedules.js"));
+    app.register(import("./routes/appointments.js"));
 
     // Handler de errores
     app.setErrorHandler((err, _req, reply) => {

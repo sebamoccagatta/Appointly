@@ -8,8 +8,13 @@ const authPlugin: FastifyPluginAsync = async (app) => {
   app.addHook("preHandler", async (request, reply) => {
     const url = request.url;
     const method = request.method;
-    if (url === "/health" || url.startsWith("/auth/") || method === "GET" && url.startsWith("/offerings")) {
-      return; // no exigir token
+    if (
+      url === "/health" ||
+      url.startsWith("/auth/") ||
+      (method === "GET" && url.startsWith("/offerings")) ||
+      (method === "GET" && url.includes("/schedules/") && url.endsWith("/availability"))
+    ) {
+      return;
     }
     const auth = request.headers.authorization;
     if (!auth?.startsWith("Bearer ")) {

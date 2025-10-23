@@ -96,3 +96,26 @@ model ScheduleException {
 
   schedule Schedule @relation(fields: [scheduleId], references: [id])
 }
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Appointment {
+  id             String            @id @default(uuid())
+  scheduleId     String
+  offeringId     String
+  professionalId String
+  customerId     String
+  start          DateTime
+  end            DateTime
+  status         AppointmentStatus @default(PENDING)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([scheduleId, start, end])
+  @@index([professionalId])
+  @@index([offeringId])
+}

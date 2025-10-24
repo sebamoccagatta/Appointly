@@ -1,6 +1,6 @@
 import { getPrisma } from "../prisma/client.js";
-import type { Appointment } from "domain/src/entities/appointment.js";
-import type { AppointmentRepository } from "domain/src/services/appointment-ports.js";
+import type { Appointment } from "domain/dist/entities/appointment.js";
+import type { AppointmentRepository } from "domain/dist/services/appointment-ports.js";
 
 function mapRow(a: any): Appointment {
     return {
@@ -76,10 +76,31 @@ export class PrismaAppointmentRepo implements AppointmentRepository {
         });
     }
 
-    findById(id: string): Promise<Appointment | null> {
-        throw new Error("Method not implemented.");
+    async findById(id: string): Promise<Appointment | null> {
+        const db = getPrisma();
+        const row = await db.appointment.findUnique({ where: { id } });
+        return row ? mapRow(row) : null;
     }
-    update(appointment: Appointment): Promise<void> {
-        throw new Error("Method not implemented.");
+    async update(appt: Appointment): Promise<void> {
+        return this.save(appt);
     }
+
+    async save(appt: Appointment): Promise<void> {
+        const db = getPrisma();
+        await db.appointment.update({
+            where: { id: appt.id },
+            data: {
+                scheduleId: appt.scheduleId,
+                offeringId: appt.offeringId,
+                professionalId: appt.professionalId,
+                customerId: appt.customerId,
+                start: appt.start,
+                end: appt.end,
+                status: appt.status as any,
+                createdAt: appt.createdAt,
+                updatedAt: appt.updatedAt,
+            },
+        });
+    }
+
 }

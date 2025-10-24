@@ -1,4 +1,3 @@
-// domain/src/use-cases/create-appointment.spec.ts
 import { describe, expect, test } from "vitest";
 
 import type { Appointment } from "../entities/appointment";

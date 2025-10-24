@@ -1,5 +1,5 @@
 import { getPrisma } from "../prisma/client.js";
-import { Offering } from "domain/src/entities/offering.js";
+import { Offering } from "domain/dist/entities/offering.js";
 import { OfferingRepository } from 'domain/dist/services/offering-ports.js';
 
 export class PrismaOfferingRepo implements OfferingRepository {

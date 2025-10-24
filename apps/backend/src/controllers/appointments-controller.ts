@@ -2,9 +2,12 @@ import { PrismaOfferingRepo } from "../infra/adapters/offering-repo.js";
 import { PrismaScheduleRepo } from "../infra/adapters/schedule-repo.js";
 import { PrismaAppointmentRepo } from "../infra/adapters/appointment-repo.js";
 import { uuidGenerator, systemClock } from "../infra/system/shared.js";
+import { backendAppointmentPolicy } from "../policies/appointments.js";
 
-import { createAppointment } from "domain/src/use-cases/create-appointment.js";
-import { listAvailableSlots } from "domain/src/use-cases/list-availability.js";
+import { createAppointment } from "domain/dist/use-cases/create-appointment.js";
+import { listAvailableSlots } from "domain/dist/use-cases/list-availability.js";
+import { confirmAppointment } from "domain/dist/use-cases/confirm-appointment.js";
+import { cancelAppointment } from "domain/dist/use-cases/cancel-appointment.js"
 
 export async function createAppointmentController(input: {
     scheduleId: string;
@@ -57,4 +60,41 @@ export async function listAvailableSlotsController(input: {
     });
 
     return slots;
+}
+
+export async function confirmAppointmentController(input: {
+    appointmentId: string;
+}) {
+    const appointmentRepo = new PrismaAppointmentRepo();
+
+    const appt = await confirmAppointment({
+        data: { id: input.appointmentId },
+        deps: { appointmentRepo, clock: systemClock() },
+    });
+
+    return appt;
+}
+
+export async function cancelAppointmentController(input: {
+    appointmentId: string;
+    actor: { id: string; role: "ADMIN" | "USER" | "ASSISTANT" };
+    reason?: string;
+}) {
+    const repo = new PrismaAppointmentRepo();
+
+    const result = await cancelAppointment({
+        data: {
+            appointmentId: input.appointmentId,
+            actorId: input.actor.id,
+            actorRole: input.actor.role,
+            ...(input.reason !== undefined ? { reason: input.reason } : {}),
+        },
+        deps: {
+            repo,
+            policy: { cancelMinHours: 0 },
+            clock: systemClock(),
+        },
+    });
+
+    return result;
 }

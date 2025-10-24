@@ -14,4 +14,5 @@ export interface AppointmentRepository {
     from: Date;
     to: Date;
   }): Promise<import("../entities/appointment").Appointment[]>;
+  save(appt: Appointment): Promise<void>;
 }

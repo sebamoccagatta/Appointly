@@ -1,6 +1,6 @@
 import { getPrisma } from "../prisma/client.js";
-import type { Schedule } from "domain/src/entities/schedule.js";
-import type { ScheduleRepository } from "domain/src/services/schedule-ports.js";
+import type { Schedule } from "domain/dist/entities/schedule.js";
+import type { ScheduleRepository } from "domain/dist/services/schedule-ports.js";
 
 export class PrismaScheduleRepo implements ScheduleRepository {
     async findById(id: string): Promise<Schedule | null> {

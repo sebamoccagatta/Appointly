@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import cors from "@fastify/cors";
 import authPlugin from "./plugins/auth.js";
 
 export function buildApp() {
@@ -8,6 +9,12 @@ export function buildApp() {
             level: 'info'
         }
     });
+
+    app.register(cors, {
+        origin: ["http://localhost:5173", "http://localhost:6006"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
 
     app.register(import("./routes/health.js"));
     app.register(import("./routes/auth.js"));

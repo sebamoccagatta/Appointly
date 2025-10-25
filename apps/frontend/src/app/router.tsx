@@ -7,7 +7,7 @@ function Protected({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function LoginPage() { return <div className="p-6">Login Page</div>; }
+function LoginPage() { return <div className="p-6 bg-amber-600">Login Page</div>; }
 function DashboardPage() { return <div className="p-6">Dashboard</div>; }
 
 function AppRouterInner() {

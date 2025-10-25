@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { useAuth } from "../features/auth/store";
+import LoginPage from "../features/auth/pages/LoginPage";
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -7,7 +8,6 @@ function Protected({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function LoginPage() { return <div className="p-6 bg-amber-600">Login Page</div>; }
 function DashboardPage() { return <div className="p-6">Dashboard</div>; }
 
 function AppRouterInner() {

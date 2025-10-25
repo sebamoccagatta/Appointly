@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { AuthProvider } from "../../auth/store";
+import { AuthProvider } from "../store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LoginForm } from "./LoginForm";
 

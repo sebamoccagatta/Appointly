@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { useAuth } from "../features/auth/store";
 import LoginPage from "../features/auth/pages/LoginPage";
+import RegisterPage from "../features/auth/pages/RegisterPage";
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -14,6 +15,7 @@ function AppRouterInner() {
   const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/dashboard" replace /> },
     { path: "/login", element: <LoginPage /> },
+    { path: "/register", element: <RegisterPage /> },
     {
       path: "/dashboard",
       element: (

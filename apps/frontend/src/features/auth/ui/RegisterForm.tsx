@@ -2,7 +2,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { registerApi } from "../api";
+import { registerApi, loginApi } from "../api";
+import { useAuth } from "../store";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 
 const schema = z.object({
     name: z.string().min(1, "Requerido"),
@@ -11,13 +15,43 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
+function mapApiErrors(e: any): string {
+    const code = e?.response?.data?.error;
+    switch (code) {
+        case "USER_EMAIL_TAKEN":
+            return "Ese email ya está registrado.";
+        case "INVALID_INPUT":
+            return "Datos inválidos. Revisá los campos.";
+        default:
+            return "Error al registrar. Intentá nuevamente.";
+    }
+}
+
 export function RegisterForm() {
+    const { setAuth } = useAuth();
+    const navigate = useNavigate();
+    const [serverError, setServerError] = useState<string | null>(null);
+
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: { name: "", email: "", password: "" },
     });
 
-    const mutation = useMutation({ mutationFn: registerApi });
+    const mutation = useMutation({
+        mutationFn: async (values: FormValues) => {
+            await registerApi(values);
+            const login = await loginApi({ email: values.email, password: values.password });
+            return login;
+        },
+        onSuccess: ({ token, user }) => {
+            setServerError(null);
+            setAuth({ token, user });
+            navigate('/dashboard', { replace: true });
+        },
+        onError: (error) => {
+            setServerError(mapApiErrors(error))
+        }
+    });
 
     const onSubmit = (values: FormValues) => mutation.mutate(values);
     return (
@@ -30,30 +64,21 @@ export function RegisterForm() {
 
             <label className="flex flex-col gap-1">
                 <span>Email</span>
-                <input aria-label="Email" className="border p-2 w-full" type="email" {...register("email")} />
+                <input aria-label="Email" type="email" className="border p-2 w-full" {...register("email")} />
                 {errors.email && <span className="text-sm text-red-600">{errors.email.message}</span>}
             </label>
 
             <label className="flex flex-col gap-1">
                 <span>Password</span>
-                <input aria-label="Password" className="border p-2 w-full" type="password" {...register("password")} />
+                <input aria-label="Password" type="password" className="border p-2 w-full" {...register("password")} />
                 {errors.password && <span className="text-sm text-red-600">{errors.password.message}</span>}
             </label>
 
-            <button type="submit" className="border p-2">
+            <button type="submit" className="border p-2" disabled={mutation.isPending}>
                 {mutation.isPending ? "Creando..." : "Crear cuenta"}
             </button>
 
-            {mutation.isError && (
-                <p className="text-sm text-red-600">
-                    {(mutation.error as any)?.response?.data?.error ?? "Error al registrar"}
-                </p>
-            )}
-            {mutation.isSuccess && (
-                <p className="text-sm text-green-600">
-                    Cuenta creada para {mutation.data.name}. Ahora podés iniciar sesión.
-                </p>
-            )}
+            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
         </form>
     );
 }

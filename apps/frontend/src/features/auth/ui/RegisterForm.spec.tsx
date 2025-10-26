@@ -3,13 +3,16 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../store";
 import { RegisterForm } from "./RegisterForm";
+import { MemoryRouter } from "react-router-dom";
 
 function renderWithProviders(ui: React.ReactNode) {
     const client = new QueryClient();
     return render(
-        <QueryClientProvider client={client}>
-            <AuthProvider>{ui}</AuthProvider>
-        </QueryClientProvider>
+        <MemoryRouter initialEntries={["/register"]}>
+            <QueryClientProvider client={client}>
+                <AuthProvider>{ui}</AuthProvider>
+            </QueryClientProvider>
+        </MemoryRouter>
     );
 }
 
@@ -39,9 +42,7 @@ describe("RegisterForm", () => {
         fireEvent.click(screen.getByRole("button", { name: /crear cuenta/i }));
 
         await waitFor(() => {
-            // En este test solo validamos que el registro devuelva 201 sin romper.
-            // El guardado de token ocurre en Login, no en Register.
-            // Si quisieras autologin, lo validamos en GREEN opcional.
+
             expect(screen.queryByText(/error/i)).toBeNull();
         });
     });

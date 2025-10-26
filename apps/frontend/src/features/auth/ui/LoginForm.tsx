@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { loginApi } from "../api";
 import { useAuth } from "../../auth/store";
+import { useState } from "react";
 
 const schema = z.object({
     email: z.string().min(1, "Requerido").email("Email inválido"),
@@ -14,6 +15,19 @@ type FormValues = z.infer<typeof schema>;
 
 export function LoginForm() {
     const { setAuth } = useAuth();
+    const [serverError, setServerError] = useState<string | null>(null);
+
+    function mapLoginError(e: any): string {
+        const code = e?.response?.data?.error;
+        switch (code) {
+            case "AUTH_INVALID_CREDENTIALS":
+                return "Credenciales inválidas.";
+            case "USER_BLOCKED":
+                return "Tu cuenta está bloqueada.";
+            default:
+                return "No se pudo iniciar sesión.";
+        }
+    }
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -26,6 +40,9 @@ export function LoginForm() {
         onSuccess: ({ token, user }) => {
             setAuth({ token, user });
         },
+        onError: (error) => {
+            setServerError(mapLoginError(error));
+        }
     });
 
     const onSubmit = (values: FormValues) => {
@@ -60,11 +77,7 @@ export function LoginForm() {
                 {mutation.isPending ? "Ingresando..." : "Ingresar"}
             </button>
 
-            {mutation.isError && (
-                <p className="text-sm text-red-600">
-                    {(mutation.error as any)?.response?.data?.error ?? "Error al ingresar"}
-                </p>
-            )}
+            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
         </form>
     );
 }

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { registerApi, loginApi } from "../api";
+import { registerApi, loginApi, getMeApi } from "../api";
 import { useAuth } from "../store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -43,10 +43,21 @@ export function RegisterForm() {
             const login = await loginApi({ email: values.email, password: values.password });
             return login;
         },
-        onSuccess: ({ token, user }) => {
+        onSuccess: async (res) => {
             setServerError(null);
-            setAuth({ token, user });
-            navigate('/dashboard', { replace: true });
+            const token = res.accessToken;
+            if (!token) { setServerError("Login sin token"); return; }
+
+            localStorage.setItem("auth", JSON.stringify({ token }));
+            localStorage.setItem("token", token);
+
+            try {
+                const user = await getMeApi();
+                setAuth({ token, user });
+                navigate('/dashboard', { replace: true });
+            } catch {
+                setServerError("No se pudo obtener el perfil.");
+            }
         },
         onError: (error) => {
             setServerError(mapApiErrors(error))

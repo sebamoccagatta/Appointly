@@ -16,14 +16,9 @@ export function buildApp() {
         allowedHeaders: ["Content-Type", "Authorization"],
     })
 
+    app.register(authPlugin);
     app.register(import("./routes/health.js"));
     app.register(import("./routes/auth.js"));
-    app.register(authPlugin);
-
-    app.get("/me", async (req, reply) => {
-        return reply.send({ user: req.user });
-
-    })
     app.register(import("./routes/offerings.js"));
     app.register(import("./routes/schedules.js"));
     app.register(import("./routes/appointments.js"));

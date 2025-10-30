@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { registerController, loginController } from "../controllers/auth-controller.js";
+import { registerController, loginController, getProfileController } from "../controllers/auth-controller.js";
 import { mapDomainErrorToHttp } from "../errors/map-domain-error.js";
 
 export default async function authRoutes(app: FastifyInstance) {
@@ -43,5 +43,10 @@ export default async function authRoutes(app: FastifyInstance) {
             const mapped = mapDomainErrorToHttp(err);
             return reply.status(mapped.status).send({ error: mapped.code, message: mapped.message });
         }
+    });
+
+    app.get("/auth/me", {
+        preHandler: [app.authenticate],
+        handler: getProfileController,
     });
 }

@@ -1,39 +1,41 @@
+// src/plugins/auth.ts
 import fp from "fastify-plugin";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET ?? "dev-secret";
+declare module "fastify" {
+  interface FastifyRequest {
+    user?: {
+      sub: string;
+      role: "ADMIN" | "USER" | "ASSISTANT";
+      email?: string;
+      name?: string;
+    };
+  }
+  interface FastifyInstance {
+    authenticate: (req: FastifyRequest, reply: FastifyReply) => Promise<void>;
+  }
+}
 
 const authPlugin: FastifyPluginAsync = async (app) => {
-  app.addHook("preHandler", async (request, reply) => {
-    const url = request.url;
-    const method = request.method;
-    if (
-      url === "/health" ||
-      url.startsWith("/auth/") ||
-      (method === "GET" && url.startsWith("/offerings")) ||
-      (method === "GET" && url.includes("/schedules/") && url.endsWith("/availability"))
-    ) {
-      return;
+  app.decorate("authenticate", async (req, reply) => {
+    const header = req.headers.authorization;
+    if (!header?.startsWith("Bearer ")) {
+      return reply.status(401).send({ error: "MISSING_AUTH_HEADER" });
     }
-    const auth = request.headers.authorization;
-    if (!auth?.startsWith("Bearer ")) {
-      reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
-      return;
-    }
-
-    const token = auth.slice(7);
+    const token = header.slice("Bearer ".length);
     try {
-      const decoded = jwt.verify(token, SECRET) as {
+      const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
         sub: string;
-        role: "ADMIN" | "USER" | "ASSISTANT" | string;
+        role: "ADMIN" | "USER" | "ASSISTANT";
+        email?: string;
+        name?: string;
       };
-      request.user = { id: decoded.sub, role: decoded.role as any };
+      req.user = payload;
     } catch {
-      reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
-      return;
+      return reply.status(401).send({ error: "INVALID_TOKEN" });
     }
   });
 };
 
-export default fp(authPlugin, { name: "auth" });
+export default fp(authPlugin);

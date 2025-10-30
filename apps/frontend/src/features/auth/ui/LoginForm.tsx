@@ -2,9 +2,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { loginApi } from "../api";
+import { getMeApi, loginApi } from "../api";
 import { useAuth } from "../../auth/store";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const schema = z.object({
     email: z.string().min(1, "Requerido").email("Email inválido"),
@@ -16,6 +17,7 @@ type FormValues = z.infer<typeof schema>;
 export function LoginForm() {
     const { setAuth } = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     function mapLoginError(e: any): string {
         const code = e?.response?.data?.error;
@@ -37,8 +39,20 @@ export function LoginForm() {
 
     const mutation = useMutation({
         mutationFn: loginApi,
-        onSuccess: ({ token, user }) => {
-            setAuth({ token, user });
+        onSuccess: async (res) => {
+            const token = res.accessToken;
+            if (!token) { setServerError("Login sin token"); return; }
+
+            localStorage.setItem("auth", JSON.stringify({ token }));
+            localStorage.setItem("token", token);
+
+            try {
+                const user = await getMeApi();
+                setAuth({ token, user });           // ← ahora sí, estado consistente
+                navigate("/dashboard", { replace: true });
+            } catch {
+                setServerError("No se pudo obtener el perfil.");
+            }
         },
         onError: (error) => {
             setServerError(mapLoginError(error));

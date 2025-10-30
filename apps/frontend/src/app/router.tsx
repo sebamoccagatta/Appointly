@@ -3,7 +3,7 @@ import { useAuth } from "../features/auth/store";
 import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
 import DashboardPage from "../features/dashboard/pages/DashboardPage";
-import MyAppointmentsPage from "../features/appointments/pages/MyAppointmentsPage";
+import { MyAppointmentsPage, AppointmentsListPage, NewAppointmentPage } from "../features/appointments/pages";
 import OfferingsPage from "../features/offerings/pages/OfferingsPage";
 import SchedulesPage from "../features/schedules/pages/SchedulesPage";
 
@@ -28,7 +28,8 @@ function AppRouterInner() {
       ),
       children: [
         { index: true, element: <div className="p-6">Bienvenido/a</div> },
-        { path: "appointments", element: <MyAppointmentsPage /> },
+        { path: "appointments", element: <AppointmentsListPage /> },
+        { path: "appointments/new", element: <NewAppointmentPage /> },
         { path: "offerings", element: <OfferingsPage /> },
         { path: "schedules", element: <SchedulesPage /> },
       ]

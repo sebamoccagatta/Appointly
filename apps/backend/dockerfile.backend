@@ -1,25 +1,20 @@
 FROM node:22-alpine
 WORKDIR /app
 
-# Copiá manifests primero
 COPY package.json package-lock.json ./
 COPY apps/backend/package*.json ./apps/backend/
 COPY domain/package*.json ./domain/
 
-# ✅ Instalar (NO ci) para que resuelva "file:../../domain" dentro del build
 RUN npm install --workspaces --include-workspace-root --no-audit --no-fund
 
-# Copiá el resto
 COPY . .
 
-# Prisma (ajustá si aplica)
 RUN npx prisma generate --schema=./apps/backend/prisma/schema.prisma
 
 COPY apps/backend/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Builds
 RUN npm run build --prefix ./domain
 RUN npm run build --prefix ./apps/backend
 

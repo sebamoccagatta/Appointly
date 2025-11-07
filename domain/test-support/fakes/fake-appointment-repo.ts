@@ -1,5 +1,5 @@
-import type { Appointment } from "../../src/entities/appointment";
-import type { AppointmentRepository } from "../../src/services/appointment-ports";
+import type { Appointment } from "../../src/entities/appointment.js";
+import type { AppointmentRepository } from "../../src/services/appointment-ports.js";
 
 export class FakeAppointmentRepo implements AppointmentRepository {
   constructor(private rows: Appointment[] = []) { }

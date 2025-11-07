@@ -1,5 +1,5 @@
-import { UserRepository } from 'domain/dist/services/user-service.js';
-import { User } from 'domain/dist/entities/user.js';
+import { UserRepository } from '@app/domain/services/user-service.js';
+import { User } from '@app/domain/entities/user.js';
 import { getPrisma } from '../../prisma/client.js'
 
 export class PrismaUserRepository implements UserRepository {
@@ -8,7 +8,7 @@ export class PrismaUserRepository implements UserRepository {
         const user = await db.user.findUnique({
             where: { email },
         });
-        
+
         return user ? this.map(user) : null;
     }
 
@@ -35,13 +35,13 @@ export class PrismaUserRepository implements UserRepository {
     }
 
     private map(row: any): User {
-    return {
-      id: row.id,
-      name: row.name,
-      email: row.email,
-      role: row.role,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt
-    };
-  }
+        return {
+            id: row.id,
+            name: row.name,
+            email: row.email,
+            role: row.role,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt
+        };
+    }
 }

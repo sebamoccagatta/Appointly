@@ -1,6 +1,6 @@
 import { getPrisma } from "../prisma/client.js";
-import type { Appointment } from "domain/dist/entities/appointment.js";
-import type { AppointmentRepository } from "domain/dist/services/appointment-ports.js";
+import type { Appointment } from "@app/domain/entities/appointment.js";
+import type { AppointmentRepository } from "@app/domain/services/appointment-ports.js";
 
 function mapRow(a: any): Appointment {
     return {

@@ -1,7 +1,7 @@
-import type { Schedule, WeeklyTemplateItem } from "../../src/entities/schedule";
+import type { Schedule, WeeklyTemplateItem } from "../../src/entities/schedule.js";
 
 export function fullDayTemplateFor(date: Date): WeeklyTemplateItem[] {
-  const weekday = date.getUTCDay() as 0|1|2|3|4|5|6;
+  const weekday = date.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
   return [{ weekday, windows: [{ start: "00:00", end: "23:59" }] }];
 }
 

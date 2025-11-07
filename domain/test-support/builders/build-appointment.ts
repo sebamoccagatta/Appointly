@@ -1,5 +1,5 @@
-import type { Appointment } from "../../src/entities/appointment";
-import { AppointmentStatus } from "../../src/entities/appointment";
+import type { Appointment } from "../../src/entities/appointment.js";
+import { AppointmentStatus } from "../../src/entities/appointment.js";
 
 export function buildAppointment(overrides: Partial<Appointment> = {}): Appointment {
   const now = new Date("2025-01-01T09:00:00Z");

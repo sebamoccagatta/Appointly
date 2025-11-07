@@ -1,4 +1,4 @@
-import type { Appointment } from "domain/src/entities/appointment.js";
+import type { Appointment } from "@app/domain/entities/appointment.js";
 
 type Role = "ADMIN" | "USER" | "ASSISTANT";
 

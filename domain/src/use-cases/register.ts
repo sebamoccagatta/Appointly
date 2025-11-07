@@ -2,9 +2,9 @@ import {
   User,
   UserRole,
   type UserRole as UserRoleType,
-} from "../entities/user";
-import type { UserRepository } from "../services/user-service";
-import type { IdGenerator, Clock } from "../services/shared-ports";
+} from "../entities/user.js";
+import type { UserRepository } from "../services/user-service.js";
+import type { IdGenerator, Clock } from "../services/shared-ports.js";
 
 type Deps = { repo: UserRepository; clock: Clock; ids: IdGenerator };
 

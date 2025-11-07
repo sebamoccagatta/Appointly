@@ -1,4 +1,4 @@
-import type { CredentialsRepository, CredentialsRecord } from "domain/dist/services/user-service.js";
+import type { CredentialsRepository, CredentialsRecord } from "@app/domain/services/user-service.js";
 import { getPrisma } from "../../prisma/client.js";
 
 export class PrismaCredentialsRepository implements CredentialsRepository {
@@ -6,7 +6,7 @@ export class PrismaCredentialsRepository implements CredentialsRepository {
         const db = getPrisma();
         const record = await db.credentials.findUnique({ where: { email } });
 
-        return record ? {userId: record.userId, email: record.email, passwordHash: record.passwordHash, status: record.status as any} : null;
+        return record ? { userId: record.userId, email: record.email, passwordHash: record.passwordHash, status: record.status as any } : null;
     }
 
     async create(rec: CredentialsRecord): Promise<void> {

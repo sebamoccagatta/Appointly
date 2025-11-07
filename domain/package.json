@@ -1,16 +1,29 @@
 {
-  "name": "domain",
+  "name": "@app/domain",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "vitest",
-    "build": "tsc -p tsconfig.json"
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest"
+  },
   "devDependencies": {
+    "@types/node": "^24.10.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

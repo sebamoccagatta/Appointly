@@ -1,10 +1,10 @@
-import type { OfferingRepository } from "../services/offering-ports";
-import type { ScheduleRepository } from "../services/schedule-ports";
-import type { AppointmentRepository } from "../services/appointment-ports";
+import type { OfferingRepository } from "../services/offering-ports.js";
+import type { ScheduleRepository } from "../services/schedule-ports.js";
+import type { AppointmentRepository } from "../services/appointment-ports.js";
 
-import { resolveWindowsForDate, eachDayUTC } from "../utils/schedule-availability";
-import { addMinutes } from "../utils/date";
-import { setTimeUTC, parseHHMM } from "../utils/time-window";
+import { resolveWindowsForDate, eachDayUTC } from "../utils/schedule-availability.js";
+import { addMinutes } from "../utils/date.js";
+import { setTimeUTC, parseHHMM } from "../utils/time-window.js";
 
 type Deps = {
   offeringRepo: OfferingRepository;
@@ -66,7 +66,7 @@ export async function listAvailableSlots(args: {
         // Filtrar por overlap con buffer (expande los turnos existentes en ambos lados)
         const overlaps = existing.some(a => {
           const aFrom = addMinutes(a.start, -buffer);
-          const aTo   = addMinutes(a.end,   buffer);
+          const aTo = addMinutes(a.end, buffer);
           return slotStart < aTo && aFrom < slotEnd;
         });
         if (overlaps) continue;

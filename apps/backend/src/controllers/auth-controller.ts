@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { buildDomainDeps } from "../di/container.js";
-import { createUser } from "domain/dist/use-cases/register.js";
+import { createUser } from "@app/domain/use-cases/register.js";
 import { getPrisma } from "../infra/prisma/client.js";
 import { issueAccessToken } from "../infra/auth/jwt.js";
 
@@ -28,10 +28,10 @@ export async function registerController(input: Input) {
     const db = getPrisma();
     await db.credentials.create({
         data: {
-        userId: user.id,
-        email: user.email,
-        passwordHash: hash,
-        status: "ACTIVE",
+            userId: user.id,
+            email: user.email,
+            passwordHash: hash,
+            status: "ACTIVE",
         },
     });
 
@@ -42,22 +42,22 @@ export async function loginController(input: { email: string; password: string }
     const db = getPrisma();
 
     const cred = await db.credentials.findUnique({ where: { email: input.email } });
-    if(!cred) {
+    if (!cred) {
         const err = new Error("AUTH_INVALID_CREDENTIALS");
         throw err;
     }
 
-    if(cred.status !== "ACTIVE") {
+    if (cred.status !== "ACTIVE") {
         throw new Error("AUTH_INVALID_CREDENTIALS");
     }
 
     const comparePass = await bcrypt.compare(input.password, cred.passwordHash);
-    if(!comparePass) {
+    if (!comparePass) {
         throw new Error("AUTH_INVALID_CREDENTIALS");
     }
 
     const user = await db.user.findUnique({ where: { id: cred.userId } });
-    if(!user) {
+    if (!user) {
         throw new Error("AUTH_INVALID_CREDENTIALS");
     }
 

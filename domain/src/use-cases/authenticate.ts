@@ -2,8 +2,8 @@ import type {
   CredentialsRepository,
   PasswordVerifier,
   UserRepository,
-} from "../services/user-service";
-import type { UserRole } from "../entities/user";
+} from "../services/user-service.js";
+import type { UserRole } from "../entities/user.js";
 
 export interface AuthResult {
   userId: string;

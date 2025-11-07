@@ -3,14 +3,30 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "demo-domain": [
-        "../../domain/dist"
+      "@app/domain": [
+        "../../domain/dist/index.d.ts"
+      ],
+      "@app/domain/*": [
+        "../../domain/dist/*"
       ]
     },
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../../domain"
+    }
   ]
 }

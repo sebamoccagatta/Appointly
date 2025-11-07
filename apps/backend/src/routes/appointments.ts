@@ -66,7 +66,7 @@ export default async function appointmentsRoutes(app: FastifyInstance) {
                 offeringId,
             });
             return reply.status(200).send(
-                slots.map((s) => ({
+                slots.map((s: { start: { toISOString: () => any; }; end: { toISOString: () => any; }; }) => ({
                     start: s.start.toISOString(),
                     end: s.end.toISOString(),
                 }))

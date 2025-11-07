@@ -1,12 +1,12 @@
-import { AppointmentStatus, type Appointment } from "../entities/appointment";
-import { UserRole } from "../entities/user";
-import type { AppointmentRepository } from "../services/appointment-ports";
-import type { OfferingRepository } from "../services/offering-ports";
-import type { ScheduleRepository } from "../services/schedule-ports";
-import type { Clock, IdGenerator } from "../services/shared-ports";
-import { createAppointment } from "./create-appointment";
+import { AppointmentStatus, type Appointment } from "../entities/appointment.js";
+import { UserRole } from "../entities/user.js";
+import type { AppointmentRepository } from "../services/appointment-ports.js";
+import type { OfferingRepository } from "../services/offering-ports.js";
+import type { ScheduleRepository } from "../services/schedule-ports.js";
+import type { Clock, IdGenerator } from "../services/shared-ports.js";
+import { createAppointment } from "./create-appointment.js";
 
-import { diffHours } from "../utils/date";
+import * as date from "../utils/date.js";
 
 type Deps = {
   appointmentRepo: AppointmentRepository;
@@ -51,7 +51,7 @@ export async function rescheduleAppointment(args: {
   }
 
   if (actorRole === UserRole.USER) {
-    const hoursUntilOldStart = diffHours(now, appt.start);
+    const hoursUntilOldStart = date.diffHours(now, appt.start);
     if (hoursUntilOldStart < policy.cancelMinHours) {
       throw new Error("CANCEL_WINDOW_VIOLATION");
     }
@@ -89,7 +89,7 @@ export async function rescheduleAppointment(args: {
     ...appt,
     status: AppointmentStatus.CANCELLED,
     updatedAt: now,
-    audit: [ ...(appt.audit ?? []), auditEvent ],
+    audit: [...(appt.audit ?? []), auditEvent],
   };
 
   await appointmentRepo.update(updatedOld);

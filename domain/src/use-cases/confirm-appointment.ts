@@ -1,6 +1,6 @@
-import type { Appointment } from "../entities/appointment";
-import type { AppointmentRepository } from "../services/appointment-ports";
-import type { Clock } from "../services/shared-ports";
+import type { Appointment } from "../entities/appointment.js";
+import type { AppointmentRepository } from "../services/appointment-ports.js";
+import type { Clock } from "../services/shared-ports.js";
 
 type Deps = { appointmentRepo: AppointmentRepository; clock: Clock };
 

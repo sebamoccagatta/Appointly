@@ -4,10 +4,10 @@ import { PrismaAppointmentRepo } from "../infra/adapters/appointment-repo.js";
 import { uuidGenerator, systemClock } from "../infra/system/shared.js";
 import { backendAppointmentPolicy } from "../policies/appointments.js";
 
-import { createAppointment } from "domain/dist/use-cases/create-appointment.js";
-import { listAvailableSlots } from "domain/dist/use-cases/list-availability.js";
-import { confirmAppointment } from "domain/dist/use-cases/confirm-appointment.js";
-import { cancelAppointment } from "domain/dist/use-cases/cancel-appointment.js"
+import { createAppointment } from "@app/domain/use-cases/create-appointment.js";
+import { listAvailableSlots } from "@app/domain/use-cases/list-availability.js";
+import { confirmAppointment } from "@app/domain/use-cases/confirm-appointment.js";
+import { cancelAppointment } from "@app/domain/use-cases/cancel-appointment.js"
 
 export async function createAppointmentController(input: {
     scheduleId: string;

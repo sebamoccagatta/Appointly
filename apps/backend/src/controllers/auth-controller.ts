@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { buildDomainDeps } from "../di/container.js";
-import { createUser } from "domain/dist/use-cases/register.js";
+import { createUser } from "@app/domain/use-cases/register.js";
 import { getPrisma } from "../infra/prisma/client.js";
 import { issueAccessToken } from "../infra/auth/jwt.js";
 import { FastifyRequest, FastifyReply } from "fastify";

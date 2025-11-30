@@ -1,9 +1,9 @@
-import { AppointmentStatus, type Appointment } from "../entities/appointment";
-import { UserRole } from "../entities/user";
-import type { AppointmentRepository } from "../services/appointment-ports";
-import type { Clock } from "../services/shared-ports";
+import { AppointmentStatus, type Appointment } from "../entities/appointment.js";
+import { UserRole } from "../entities/user.js";
+import type { AppointmentRepository } from "../services/appointment-ports.js";
+import type { Clock } from "../services/shared-ports.js";
 
-import { diffHours } from "../utils/date";
+import { diffHours } from "../utils/date.js";
 
 type Deps = {
     repo: AppointmentRepository;
@@ -20,7 +20,7 @@ export async function cancelAppointment(args: {
     };
     deps: Deps;
 }): Promise<Appointment> {
-    const {data, deps } = args;
+    const { data, deps } = args;
     const { appointmentId, actorId, actorRole, reason } = data;
     const { repo, clock, policy } = deps;
 
@@ -46,7 +46,7 @@ export async function cancelAppointment(args: {
     if (actorRole === UserRole.USER) {
         const hoursUntilStart = diffHours(now, appt.start);
         if (hoursUntilStart < policy.cancelMinHours) {
-        throw new Error("CANCEL_WINDOW_VIOLATION");
+            throw new Error("CANCEL_WINDOW_VIOLATION");
         }
     }
 
@@ -61,7 +61,7 @@ export async function cancelAppointment(args: {
         ...appt,
         status: AppointmentStatus.CANCELLED,
         updatedAt: now,
-        audit: [ ...(appt.audit ?? []), auditEvent ]
+        audit: [...(appt.audit ?? []), auditEvent]
     };
 
     await repo.update(updated);

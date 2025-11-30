@@ -37,7 +37,6 @@ export default async function offeringsRoutes(app: FastifyInstance) {
   app.get("/offerings", async (_request, reply) => {
     const db = getPrisma();
     const items = await db.offering.findMany({
-      where: { status: "ACTIVE" },
       orderBy: { createdAt: "desc" },
     });
 
@@ -53,23 +52,24 @@ export default async function offeringsRoutes(app: FastifyInstance) {
     );
   });
 
-  app.patch("/offerings/:id/deactivate", async (request, reply) => {
+  app.patch("/offerings/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const body = request.body as {
+      name?: string;
+      durationMinutes?: number;
+      status?: "ACTIVE" | "INACTIVE";
+    };
+
     if (request.user?.role !== "ADMIN") {
-        return reply.status(403).send({ error: "FORBIDDEN" });
+      return reply.status(403).send({ error: "FORBIDDEN" });
     }
 
-    const { id } = request.params as { id: string };
     const db = getPrisma();
-
-    const result = await db.offering.updateMany({
-        where: { id, status: "ACTIVE" },
-        data: { status: "INACTIVE" },
+    const offering = await db.offering.update({
+      where: { id },
+      data: body,
     });
 
-    if (result.count === 0) {
-        return reply.status(404).send({ error: "OFFERING_NOT_FOUND" });
-    }
-
-    return reply.status(200).send({ id, status: "INACTIVE" });
+    return offering;
   });
 }

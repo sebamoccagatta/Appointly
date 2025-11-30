@@ -1,4 +1,4 @@
-import type { Appointment } from "../entities/appointment";
+import type { Appointment } from "../entities/appointment.js";
 
 export interface AppointmentRepository {
   findOverlap(params: {
@@ -13,6 +13,6 @@ export interface AppointmentRepository {
     scheduleId: string;
     from: Date;
     to: Date;
-  }): Promise<import("../entities/appointment").Appointment[]>;
+  }): Promise<Appointment[]>;
   save(appt: Appointment): Promise<void>;
 }

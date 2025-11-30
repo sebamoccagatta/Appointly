@@ -1,4 +1,4 @@
-import type { Offering } from "../../src/entities/offering";
+import type { Offering } from "../../src/entities/offering.js";
 
 export function buildOffering(overrides: Partial<Offering> = {}): Offering {
   const now = new Date("2025-01-01T09:00:00Z");

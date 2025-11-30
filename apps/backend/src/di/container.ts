@@ -1,7 +1,7 @@
-import type { Clock, IdGenerator } from 'domain/dist/services/shared-ports.js';
-import type { UserRepository, CredentialsRepository } from 'domain/dist/services/user-service.js';
-import { PrismaUserRepository } from 'src/infra/repositories/prisma/user-repo.js';
-import { PrismaCredentialsRepository } from 'src/infra/repositories/prisma/credentials-repo.js';
+import type { Clock, IdGenerator } from '@app/domain/services/shared-ports.js';
+import type { UserRepository, CredentialsRepository } from '@app/domain/services/user-service.js';
+import { PrismaUserRepository } from '../infra/repositories/prisma/user-repo.js';
+import { PrismaCredentialsRepository } from '../infra/repositories/prisma/credentials-repo.js';
 import { systemClock, uuidGenerator } from '../infra/system/shared.js';
 
 
@@ -13,15 +13,15 @@ let singletons: {
 } = {};
 
 export function buildDomainDeps() {
-    if (!singletons.userRepo) singletons.userRepo = new PrismaUserRepository();
-    if (!singletons.credentialsRepo) singletons.credentialsRepo = new PrismaCredentialsRepository();
-    if (!singletons.clock) singletons.clock = systemClock();
-    if (!singletons.ids) singletons.ids = uuidGenerator();
+  if (!singletons.userRepo) singletons.userRepo = new PrismaUserRepository();
+  if (!singletons.credentialsRepo) singletons.credentialsRepo = new PrismaCredentialsRepository();
+  if (!singletons.clock) singletons.clock = systemClock();
+  if (!singletons.ids) singletons.ids = uuidGenerator();
 
-    return {
-        repo: singletons.userRepo!,
-        credentialsRepo: singletons.credentialsRepo!,
-        clock: singletons.clock!,
-        ids: singletons.ids!
-    };
+  return {
+    repo: singletons.userRepo!,
+    credentialsRepo: singletons.credentialsRepo!,
+    clock: singletons.clock!,
+    ids: singletons.ids!
+  };
 }

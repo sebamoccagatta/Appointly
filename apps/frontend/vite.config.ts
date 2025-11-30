@@ -13,15 +13,28 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://backend:3000", // el nombre del servicio en docker-compose
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
+  optimizeDeps: {
+    force: false,
+  },
   test: {
     projects: [{
       extends: true,
       plugins: [
-      // The plugin will run tests for the stories defined in your Storybook config
-      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-      storybookTest({
-        configDir: path.join(dirname, '.storybook')
-      })],
+        // The plugin will run tests for the stories defined in your Storybook config
+        // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+        storybookTest({
+          configDir: path.join(dirname, '.storybook')
+        })],
       test: {
         name: 'storybook',
         browser: {

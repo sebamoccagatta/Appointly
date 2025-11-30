@@ -1,15 +1,17 @@
+# apps/frontend/dockerfile.frontend
 FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY apps/frontend/package*.json ./apps/frontend/
+# Solo el package del frontend
+COPY apps/frontend/package*.json ./
 
-RUN npm install --workspaces --include-workspace-root --no-audit --no-fund
+# Instalar deps del frontend
+RUN npm install --no-audit --no-fund
 
-COPY . .
+# Copiar el código del frontend al contenedor
+COPY apps/frontend ./
 
-WORKDIR /app/apps/frontend
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--strictPort"]

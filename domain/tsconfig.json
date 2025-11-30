@@ -1,7 +1,12 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "noImplicitAny": false,
+    "composite": true,
     "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "rootDir": "src",
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
@@ -17,7 +22,11 @@
       "@services/*": [
         "src/services/*"
       ]
-    }
+    },
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true
   },
   "include": [
     "src/**/*"
@@ -25,6 +34,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.d.ts"
   ]
 }

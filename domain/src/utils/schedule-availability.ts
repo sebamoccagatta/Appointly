@@ -1,6 +1,6 @@
-import type { Schedule, WeeklyTemplateItem } from "../entities/schedule";
-import { addDaysUTC, startOfUTCDay, toYYYYMMDDUTC } from "./date";
-import { parseHHMM, minutesOfDayUTC } from "./time-window";
+import type { Schedule, WeeklyTemplateItem } from "../entities/schedule.js";
+import { addDaysUTC, startOfUTCDay, toYYYYMMDDUTC } from "./date.js";
+import { parseHHMM, minutesOfDayUTC } from "./time-window.js";
 
 export function isWithinAvailability(schedule: Schedule, start: Date, end: Date): boolean {
   const dateStr = toYYYYMMDDUTC(start);

@@ -1,6 +1,6 @@
 import { getPrisma } from "../prisma/client.js";
-import { Offering } from "domain/dist/entities/offering.js";
-import { OfferingRepository } from 'domain/dist/services/offering-ports.js';
+import { Offering } from "@app/domain/entities/offering.js";
+import { OfferingRepository } from '@app/domain/services/offering-ports.js';
 
 export class PrismaOfferingRepo implements OfferingRepository {
     async findById(id: string): Promise<Offering | null> {

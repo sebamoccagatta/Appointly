@@ -1,11 +1,11 @@
-import { Appointment, AppointmentStatus } from "../entities/appointment";
-import type { OfferingRepository } from "../services/offering-ports";
-import type { ScheduleRepository } from "../services/schedule-ports";
-import type { AppointmentRepository } from "../services/appointment-ports";
-import type { Clock, IdGenerator } from "../services/shared-ports";
+import { Appointment, AppointmentStatus } from "../entities/appointment.js";
+import type { OfferingRepository } from "../services/offering-ports.js";
+import type { ScheduleRepository } from "../services/schedule-ports.js";
+import type { AppointmentRepository } from "../services/appointment-ports.js";
+import type { Clock, IdGenerator } from "../services/shared-ports.js";
 
-import { addMinutes } from "../utils/date";
-import { isWithinAvailability } from "../utils/schedule-availability";
+import { addMinutes } from "../utils/date.js";
+import { isWithinAvailability } from "../utils/schedule-availability.js";
 
 
 type Deps = {

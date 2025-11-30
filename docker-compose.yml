@@ -1,0 +1,66 @@
+services:
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: appointly-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/dockerfile.backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:admin@database:5432/appointly-postgres
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev --prefix ./apps/backend
+  pgadmin:
+    image: dpage/pgadmin4:8
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80" # accedés en http://localhost:5050
+    depends_on:
+      - database
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/dockerfile.frontend
+    environment:
+      VITE_API_URL: http://localhost:3000
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_HMR_HOST: "localhost"
+      VITE_HMR_PORT: "5173"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      # Montamos SOLO el código fuente y configs clave
+      - ./apps/frontend/src:/app/src
+      - ./apps/frontend/index.html:/app/index.html
+      - ./apps/frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./apps/frontend/postcss.config.js:/app/postcss.config.js
+      - ./apps/frontend/tsconfig.json:/app/tsconfig.json
+    command: npm run dev -- --host 0.0.0.0 --strictPort
+
+volumes:
+  postgres_data:
+  pgadmin_data:

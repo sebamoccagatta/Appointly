@@ -1,4 +1,3 @@
-// src/modules/appointments/pages/AppointmentBookingPage.tsx
 import { useState } from "react";
 import { useOfferingsList } from "../../offerings/hooks/useOfferings";
 import { useMySchedule } from "../../schedule/hooks/useSchedule";

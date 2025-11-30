@@ -1,21 +1,55 @@
-// apps/backend/src/errors/map-domain-error.ts
-export function mapDomainErrorToHttp(err: any): { status: number; code: string; message?: string } {
-  const code = typeof err?.message === "string" ? err.message : "INTERNAL_ERROR";
+export function mapDomainErrorToHttp(err: { code: string | number; }) {
+  const COMMON_ERRORS = {
+    AUTH_INVALID_CREDENTIALS: {
+      status: 401,
+      code: "INVALID_CREDENTIALS",
+      message: "Email o contraseña incorrectos.",
+    },
+    USER_ALREADY_EXISTS: {
+      status: 400,
+      code: "USER_ALREADY_EXISTS",
+      message: "Ya existe un usuario con ese email.",
+    },
+    USER_NOT_FOUND: {
+      status: 404,
+      code: "USER_NOT_FOUND",
+      message: "El usuario no existe.",
+    },
+    INVALID_EMAIL_FORMAT: {
+      status: 400,
+      code: "INVALID_EMAIL",
+      message: "El email ingresado no es válido.",
+    },
+    PASSWORD_TOO_SHORT: {
+      status: 400,
+      code: "PASSWORD_TOO_SHORT",
+      message: "La contraseña es demasiado corta.",
+    },
 
-  switch (code) {
-    case "USER_INVALID_EMAIL":
-    case "USER_INVALID_NAME":
-    case "USER_INVALID_PASSWORD":
-    case "USER_INVALID_ROLE":
-      return { status: 400, code };
+    TOKEN_INVALID: {
+      status: 401,
+      code: "TOKEN_INVALID",
+      message: "Token inválido. Iniciá sesión nuevamente.",
+    },
 
-    case "USER_EMAIL_TAKEN":
-      return { status: 400, code }; // o 409 si preferís
+    TOKEN_EXPIRED: {
+      status: 401,
+      code: "TOKEN_EXPIRED",
+      message: "Tu sesión expiró. Volvé a iniciar sesión.",
+    },
+  } as const;
 
-    case "AUTH_INVALID_CREDENTIALS":
-      return { status: 401, code };
+  type CommonErrorKey = keyof typeof COMMON_ERRORS;
 
-    default:
-      return { status: 500, code: "INTERNAL_ERROR", message: code };
+  // Si el error pertenece al dominio → lo mapeamos
+  if (typeof err?.code === "string" && (err.code as CommonErrorKey) in COMMON_ERRORS) {
+    return COMMON_ERRORS[err.code as CommonErrorKey];
   }
+
+  // Si no, devolvemos uno genérico
+  return {
+    status: 500,
+    code: "INTERNAL_ERROR",
+    message: "Ocurrió un error inesperado. Intentá nuevamente.",
+  };
 }

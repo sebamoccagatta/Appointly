@@ -1,11 +1,16 @@
 import fp from "fastify-plugin";
 import type { FastifyPluginAsync } from "fastify";
 import jwt from "jsonwebtoken";
+import { getPrisma } from "../infra/prisma/client.js";
 
 const SECRET = process.env.JWT_SECRET ?? "dev-secret";
 
 const authPlugin: FastifyPluginAsync = async (app) => {
   app.addHook("preHandler", async (request, reply) => {
+    if (request.method === "OPTIONS") {
+      return;
+    }
+
     const url = request.url;
     const method = request.method;
     if (
@@ -16,19 +21,31 @@ const authPlugin: FastifyPluginAsync = async (app) => {
     ) {
       return;
     }
-    const auth = request.headers.authorization;
-    if (!auth?.startsWith("Bearer ")) {
+    const authHeader = request.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
       reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
       return;
     }
 
-    const token = auth.slice(7);
+    const token = authHeader.slice(7);
     try {
       const decoded = jwt.verify(token, SECRET) as {
         sub: string;
-        role: "ADMIN" | "USER" | "ASSISTANT" | string;
+        role: "ADMIN" | "USER" | "ASSISTANT";
       };
-      request.user = { id: decoded.sub, role: decoded.role as any };
+
+      const db = getPrisma();
+      const user = await db.user.findUnique({
+        where: { id: decoded.sub },
+        select: { id: true, name: true, email: true, role: true },
+      });
+
+      if (!user) {
+        reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
+        return;
+      }
+
+      request.user = user;
     } catch {
       reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
       return;

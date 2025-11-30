@@ -1,9 +1,22 @@
+// src/plugins/auth.ts
 import fp from "fastify-plugin";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
 import { getPrisma } from "../infra/prisma/client.js";
 
-const SECRET = process.env.JWT_SECRET ?? "dev-secret";
+declare module "fastify" {
+  interface FastifyRequest {
+    user?: {
+      sub: string;
+      role: "ADMIN" | "USER" | "ASSISTANT";
+      email?: string;
+      name?: string;
+    };
+  }
+  interface FastifyInstance {
+    authenticate: (req: FastifyRequest, reply: FastifyReply) => Promise<void>;
+  }
+}
 
 const authPlugin: FastifyPluginAsync = async (app) => {
   app.addHook("preHandler", async (request, reply) => {
@@ -29,7 +42,7 @@ const authPlugin: FastifyPluginAsync = async (app) => {
 
     const token = authHeader.slice(7);
     try {
-      const decoded = jwt.verify(token, SECRET) as {
+      const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
         sub: string;
         role: "ADMIN" | "USER" | "ASSISTANT";
       };
@@ -47,10 +60,9 @@ const authPlugin: FastifyPluginAsync = async (app) => {
 
       request.user = user;
     } catch {
-      reply.code(401).send({ error: "AUTH_INVALID_CREDENTIALS" });
-      return;
+      return reply.status(401).send({ error: "INVALID_TOKEN" });
     }
   });
 };
 
-export default fp(authPlugin, { name: "auth" });
+export default fp(authPlugin);

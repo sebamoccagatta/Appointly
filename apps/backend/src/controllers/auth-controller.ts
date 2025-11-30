@@ -3,6 +3,7 @@ import { buildDomainDeps } from "../di/container.js";
 import { createUser } from "@app/domain/use-cases/register.js";
 import { getPrisma } from "../infra/prisma/client.js";
 import { issueAccessToken } from "../infra/auth/jwt.js";
+import { FastifyRequest, FastifyReply } from "fastify";
 
 type Input = {
     name: string;
@@ -63,4 +64,23 @@ export async function loginController(input: { email: string; password: string }
 
     return issueAccessToken({ userId: user.id, role: user.role as any });
 
+}
+
+export async function getProfileController(req: FastifyRequest, reply: FastifyReply) {
+    try {
+        const userId = req.user?.sub; // viene del token JWT (auth plugin)
+        if (!userId) return reply.status(401).send({ error: "UNAUTHORIZED" });
+
+        const user = await getPrisma().user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, email: true, role: true },
+        });
+
+        if (!user) return reply.status(404).send({ error: "USER_NOT_FOUND" });
+
+        return reply.send(user);
+    } catch (err) {
+        req.log.error({ err }, "getProfile failed");
+        return reply.status(500).send({ error: "INTERNAL_ERROR" });
+    }
 }
